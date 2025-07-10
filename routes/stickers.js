@@ -1,6 +1,5 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-// const stickers = require('../data/stickers');
 const Sticker = require('../models/Sticker');
 const router = express.Router();
 
