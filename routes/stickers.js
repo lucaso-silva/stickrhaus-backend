@@ -1,7 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const stickers = require('../data/stickers');
-
+// const stickers = require('../data/stickers');
+const Sticker = require('../models/Sticker');
 const router = express.Router();
 
 const limiter = rateLimit({
@@ -13,16 +13,66 @@ const limiter = rateLimit({
 router.use(limiter);
 
 //GET all stickers
-router.get('/', (req, res) => {
-    res.json(stickers);
+router.get('/', async (req, res) => {
+    try{
+        const stickers = await Sticker.find();
+        res.json(stickers);
+    }catch(err){
+        res.status(500).json({error:'Failed to fetch stickers.'});
+    }
 });
 
 //Get by ID
-router.get('/:id', (req,res)=>{
-    const sticker = stickers.find(s => String(s.id)===req.params.id);
+router.get('/:id', async (req,res)=>{
+    try{
+        const sticker = await Sticker.findById(req.params.id);
+        sticker ? res.json({...sticker._doc, id:sticker._id}) : res.status(404).json({error:'Sticker not found'});
 
-    if(!sticker) return res.status(404).json({error: 'Sticker not found'});
-    res.json(sticker);
+    }catch(err){
+        res.status(400).json({error:'Invalid sticker ID'})
+    }
+});
+
+//POST a new sticker
+router.post('/', async (req, res)=>{
+    try{
+        const newSticker = new Sticker(req.body);
+        const saved = await newSticker.save();
+        res.status(201).json({...saved._doc, id:saved._id});
+    }catch(err){
+        res.status(400).json({error:'Invalid input'});
+    }
+});
+
+//DELETE a sticker
+router.delete('/:id', async (req,res)=>{
+    try{
+        const deleted = await Sticker.findByIdAndDelete(req.params.id);
+        deleted ? res.json({ message: 'Sticker deleted'}) : res.status(404).json({error: 'Not found'});
+    }catch(err){
+        res.status(400).json({error:'Invalid ID'});
+    }
+});
+
+//UPDATE a sticker
+router.patch('/:id', async (req,res)=>{
+    try{
+        const updatedSticker = await Sticker.findByIdAndUpdate(
+            req.params.id,
+            {
+                description: req.body.description,
+                size: req.body.size,
+                category: req.body.category,
+                price: req.body.price,
+                stock: req.body.stock,
+                discountPerCent: req.body.discountPerCent
+            },
+            { new: true }
+        );
+        res.json(updatedSticker);
+    }catch(err){
+        res.status(400).json({message: err.message});
+    }
 });
 
 module.exports = router;
