@@ -48,13 +48,29 @@ router.post('/login', async (req,res)=>{
             sameSite: 'Lax',
             maxAge: 7*24*60*60*1000
         })
-            .json({ user })
+            .json({ user });
 
     }catch(err){
         console.error(err);
         res.status(500).json({error:'Login failed'});
     }
 });
+
+//Me route
+router.get('/me', async (req,res)=>{
+    const token = req.cookies.token;
+    if(!token){
+        return res.status(401).json({error: 'Missing token'});
+    }
+
+    try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId).select('firstname email createdAt');
+        res.json(user);
+    }catch(err){
+        res.status(401).json({error:'Invalid token'});
+    }
+})
 
 //Logout
 router.post('/logout', (req,res)=>{
