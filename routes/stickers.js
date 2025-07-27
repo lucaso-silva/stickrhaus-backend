@@ -2,6 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const Sticker = require('../models/Sticker');
 const router = express.Router();
+const { verifyToken } = require('../middleware/auth');
 
 const limiter = rateLimit({
     windowMs: 15*60*1000,
@@ -33,7 +34,7 @@ router.get('/:id', async (req,res)=>{
 });
 
 //POST a new sticker
-router.post('/', async (req, res)=>{
+router.post('/',  async (req, res)=>{
     try{
         const newSticker = new Sticker(req.body);
         const saved = await newSticker.save();

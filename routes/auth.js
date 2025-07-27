@@ -65,7 +65,7 @@ router.get('/me', async (req,res)=>{
 
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.userId).select('firstname email createdAt');
+        const user = await User.findById(decoded.userId).select('firstName lastName email role createdAt');
         res.json(user);
     }catch(err){
         res.status(401).json({error:'Invalid token'});

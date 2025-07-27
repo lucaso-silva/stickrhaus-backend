@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const stickersRouter = require('./routes/stickers');
 const authRouter = require('./routes/auth');
+const checkoutRouter = require('./routes/checkout');
 const cookieParser = require('cookie-parser');
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(express.static('public'));
 
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -24,6 +26,7 @@ mongoose
 
 app.use('/api/stickers', stickersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/checkout', checkoutRouter)
 
 app.listen(PORT, ()=>{
     console.log(`Server running at http://localhost:${PORT}/api/stickers`);
