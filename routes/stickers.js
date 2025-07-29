@@ -16,7 +16,20 @@ router.use(limiter);
 router.get('/', async (req, res) => {
     try{
         const stickers = await Sticker.find();
-        res.json(stickers);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        let filteredStickers = stickers;
+        const start = (page-1) * limit;
+        const paginated = filteredStickers.slice(start, start+limit);
+
+        res.json({
+            total: filteredStickers.length,
+            page,
+            limit,
+            dataPag: paginated,
+            data: stickers
+        });
     }catch(err){
         res.status(500).json({error:'Failed to fetch stickers.'});
     }
