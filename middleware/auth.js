@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config();
 
 function verifyToken(req, res, next){
     const token = req.cookies.token;
     if(!token) return res.status(401).json({ error:"Missing token"});
-
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("verifyToken: ", decoded);
+        // console.log("decoded: ", decoded);
         req.user = decoded;
         next();
     }catch(err){
@@ -14,4 +15,4 @@ function verifyToken(req, res, next){
     }
 }
 
-module.exports = { verifyToken };
+module.exports = { verifyToken};

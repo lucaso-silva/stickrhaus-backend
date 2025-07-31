@@ -4,9 +4,10 @@ const dotenv = require('dotenv');
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const DOMAIN = 'http://localhost:5000';
+const { verifyToken } = require('../middleware/auth');
 
 //POST
-router.post('/create-checkout-session', async (req,res)=>{
+router.post('/create-checkout-session', verifyToken, async (req,res)=>{
     const cart = req.body.cart;
     const cart_items = [];
     cart.map((item)=>{

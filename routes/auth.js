@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const {verifyToken, checkRole} = require("../middleware/auth");
 const router = express.Router();
 
 //Signup
@@ -18,7 +19,6 @@ router.post('/signup', async (req,res)=>{
         const newUser = new User({ firstName, lastName, email, passwordHash, role });
         await newUser.save();
 
-        //Do I need to create the token here?
         const token = jwt.sign({ userId: newUser._id}, process.env.JWT_SECRET);
         res.status(201).json({message: "New user created"});
 
@@ -63,6 +63,21 @@ router.get('/me', async (req,res)=>{
         return res.status(401).json({error: 'Missing token'});
     }
 
+    try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId).select('firstName lastName email role createdAt');
+        res.json(user);
+    }catch(err){
+        res.status(401).json({error:'Invalid token'});
+    }
+})
+
+//Admin route
+router.get('/admin',  async (req,res)=>{
+    const token = req.cookies.token;
+    if(!token) {
+        return res.status(401).json({error: 'Missing token'});
+    }
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.userId).select('firstName lastName email role createdAt');
