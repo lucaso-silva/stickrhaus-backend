@@ -3,7 +3,8 @@ const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const DOMAIN = 'http://localhost:5000';
+// const DOMAIN = 'http://localhost:5000';
+const DOMAIN = 'https://stickrhaus.vercel.app'
 const { verifyToken } = require('../middleware/auth');
 
 //POST
