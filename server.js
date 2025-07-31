@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const stickersRouter = require('./routes/stickers');
@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5000',
+    origin: 'https://stickrhaus.vercel.app',
     credentials: true
 }));
 app.use(express.json());
